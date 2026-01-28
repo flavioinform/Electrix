@@ -1,0 +1,270 @@
+.flujo-trabajo-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-lg);
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.clientes-section,
+.proyectos-section {
+    padding: var(--spacing-xl);
+}
+
+.search-wrapper {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    pointer-events: none;
+}
+
+.search-wrapper .input-field {
+    padding-left: calc(var(--spacing-md) * 2 + 16px);
+}
+
+.selected-cliente {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.selected-cliente h3 {
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: 1.125rem;
+}
+
+.selected-cliente p {
+    margin: 0;
+}
+
+.proyectos-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.proyecto-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.proyecto-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.proyecto-header:hover {
+    background: var(--color-bg-glass);
+}
+
+.proyecto-header h3 {
+    margin: 0;
+    font-size: 1.125rem;
+}
+
+.proyecto-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.viviendas-list {
+    padding: var(--spacing-lg);
+    padding-top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+    animation: slideDown var(--transition-base);
+}
+
+.vivienda-card {
+    padding: var(--spacing-lg);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.vivienda-card h4 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+}
+
+.vivienda-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--color-primary);
+}
+
+.vivienda-detalles {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+}
+
+.vivienda-detalles p:first-child {
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vivienda-detalles p:last-child {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+}
+
+/* Trabajadores Styles */
+.vivienda-trabajadores {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+}
+
+.trabajadores-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+}
+
+.trabajadores-header .flex {
+    display: flex;
+}
+
+.trabajadores-header .items-center {
+    align-items: center;
+}
+
+.trabajadores-header .gap-sm {
+    gap: var(--spacing-sm);
+}
+
+.trabajadores-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.trabajador-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--color-bg-glass);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+}
+
+.trabajador-badge span:first-child {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.trabajador-badge .text-muted {
+    font-size: 0.7rem;
+}
+
+.trabajadores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.trabajador-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.trabajador-item:hover {
+    border-color: var(--color-border-hover);
+    background: var(--color-bg-glass);
+}
+
+.trabajador-item p {
+    margin: 0;
+}
+
+.trabajadores-asignados,
+.trabajadores-disponibles {
+    margin-bottom: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+    .vivienda-checkboxes {
+        grid-template-columns: 1fr;
+    }
+
+    .proyecto-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+    }
+
+    .proyecto-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .trabajadores-grid {
+        grid-template-columns: 1fr;
+    }
+}

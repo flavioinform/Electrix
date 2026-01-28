@@ -1,0 +1,212 @@
+.perfil-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.perfil-card {
+    padding: var(--spacing-2xl);
+}
+
+.perfil-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-2xl);
+    text-align: center;
+}
+
+.perfil-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+}
+
+.perfil-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.perfil-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.input-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.input-error {
+    border-color: var(--color-error) !important;
+}
+
+.error-text {
+    display: block;
+    margin-top: var(--spacing-xs);
+    font-size: 0.75rem;
+    color: var(--color-error);
+}
+
+.help-text {
+    display: block;
+    margin-top: var(--spacing-xs);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    margin-top: var(--spacing-lg);
+}
+
+.perfil-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+}
+
+.info-value {
+    font-size: 1.125rem;
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+.especialidad-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.especialidad-badge.electricista {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--color-primary);
+}
+
+.especialidad-badge.técnico,
+.especialidad-badge.tecnico {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--color-accent);
+}
+
+.especialidad-badge.ayudante {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+}
+
+.especialidad-badge.supervisor {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-badge.activo {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+}
+
+.status-badge.inactivo {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-error);
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-2xl);
+}
+
+.empty-state p {
+    margin-bottom: var(--spacing-lg);
+}
+
+.info-card {
+    padding: var(--spacing-xl);
+}
+
+.info-card h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: 1.125rem;
+}
+
+.info-list {
+    margin: 0;
+    padding-left: var(--spacing-lg);
+    color: var(--color-text-secondary);
+}
+
+.info-list li {
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.6;
+}
+
+.info-list li:last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .perfil-container {
+        max-width: 100%;
+    }
+
+    .perfil-card {
+        padding: var(--spacing-lg);
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions button {
+        width: 100%;
+    }
+}

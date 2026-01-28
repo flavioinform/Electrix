@@ -1,0 +1,294 @@
+[
+    {
+        "id": "users",
+        "name": "users",
+        "type": "auth",
+        "system": false,
+        "schema": [
+            {
+                "id": "rut",
+                "name": "rut",
+                "type": "text",
+                "required": true,
+                "unique": true,
+                "options": {
+                    "min": null,
+                    "max": 12,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "nombre",
+                "name": "nombre",
+                "type": "text",
+                "required": true,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "rol",
+                "name": "rol",
+                "type": "select",
+                "required": true,
+                "options": {
+                    "maxSelect": 1,
+                    "values": [
+                        "gerente",
+                        "admin",
+                        "usuario"
+                    ]
+                }
+            }
+        ],
+        "listRule": "@request.auth.id != ''",
+        "viewRule": "@request.auth.id != ''",
+        "createRule": null,
+        "updateRule": "@request.auth.id = id",
+        "deleteRule": null
+    },
+    {
+        "id": "clientes",
+        "name": "clientes",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "nombre",
+                "name": "nombre",
+                "type": "text",
+                "required": true,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "tipo",
+                "name": "tipo",
+                "type": "select",
+                "required": true,
+                "options": {
+                    "maxSelect": 1,
+                    "values": [
+                        "Constructora",
+                        "Particular",
+                        "Empresa"
+                    ]
+                }
+            }
+        ],
+        "listRule": "@request.auth.id != ''",
+        "viewRule": "@request.auth.id != ''",
+        "createRule": "@request.auth.id != ''",
+        "updateRule": "@request.auth.id != ''",
+        "deleteRule": "@request.auth.id != ''"
+    },
+    {
+        "id": "proyectos",
+        "name": "proyectos",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "nombre",
+                "name": "nombre",
+                "type": "text",
+                "required": true,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "cliente",
+                "name": "cliente",
+                "type": "relation",
+                "required": true,
+                "options": {
+                    "collectionId": "clientes",
+                    "cascadeDelete": true,
+                    "maxSelect": 1,
+                    "displayFields": [
+                        "nombre"
+                    ]
+                }
+            }
+        ],
+        "listRule": "@request.auth.id != ''",
+        "viewRule": "@request.auth.id != ''",
+        "createRule": "@request.auth.id != ''",
+        "updateRule": "@request.auth.id != ''",
+        "deleteRule": "@request.auth.id != ''"
+    },
+    {
+        "id": "viviendas",
+        "name": "viviendas",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "nombre",
+                "name": "nombre",
+                "type": "text",
+                "required": true,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "proyecto",
+                "name": "proyecto",
+                "type": "relation",
+                "required": true,
+                "options": {
+                    "collectionId": "proyectos",
+                    "cascadeDelete": true,
+                    "maxSelect": 1,
+                    "displayFields": [
+                        "nombre"
+                    ]
+                }
+            },
+            {
+                "id": "factibilidad",
+                "name": "factibilidad",
+                "type": "bool",
+                "required": false
+            },
+            {
+                "id": "te1",
+                "name": "te1",
+                "type": "bool",
+                "required": false
+            },
+            {
+                "id": "empalme",
+                "name": "empalme",
+                "type": "bool",
+                "required": false
+            },
+            {
+                "id": "tda",
+                "name": "tda",
+                "type": "bool",
+                "required": false
+            },
+            {
+                "id": "canalizacion",
+                "name": "canalizacion",
+                "type": "bool",
+                "required": false
+            },
+            {
+                "id": "cableado",
+                "name": "cableado",
+                "type": "bool",
+                "required": false
+            },
+            {
+                "id": "detalles",
+                "name": "detalles",
+                "type": "text",
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            }
+        ],
+        "listRule": "@request.auth.id != ''",
+        "viewRule": "@request.auth.id != ''",
+        "createRule": "@request.auth.id != ''",
+        "updateRule": "@request.auth.id != ''",
+        "deleteRule": "@request.auth.id != ''"
+    },
+    {
+        "id": "transacciones",
+        "name": "transacciones",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "tipo",
+                "name": "tipo",
+                "type": "select",
+                "required": true,
+                "options": {
+                    "maxSelect": 1,
+                    "values": [
+                        "ingreso",
+                        "gasto"
+                    ]
+                }
+            },
+            {
+                "id": "monto",
+                "name": "monto",
+                "type": "number",
+                "required": true,
+                "options": {
+                    "min": 0,
+                    "max": null
+                }
+            },
+            {
+                "id": "descripcion",
+                "name": "descripcion",
+                "type": "text",
+                "required": true,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "fecha",
+                "name": "fecha",
+                "type": "date",
+                "required": true
+            },
+            {
+                "id": "cliente",
+                "name": "cliente",
+                "type": "relation",
+                "required": false,
+                "options": {
+                    "collectionId": "clientes",
+                    "cascadeDelete": false,
+                    "maxSelect": 1,
+                    "displayFields": [
+                        "nombre"
+                    ]
+                }
+            },
+            {
+                "id": "proyecto",
+                "name": "proyecto",
+                "type": "relation",
+                "required": false,
+                "options": {
+                    "collectionId": "proyectos",
+                    "cascadeDelete": false,
+                    "maxSelect": 1,
+                    "displayFields": [
+                        "nombre"
+                    ]
+                }
+            }
+        ],
+        "listRule": "@request.auth.id != ''",
+        "viewRule": "@request.auth.id != ''",
+        "createRule": "@request.auth.id != ''",
+        "updateRule": "@request.auth.id != ''",
+        "deleteRule": "@request.auth.id != ''"
+    }
+]
