@@ -207,6 +207,14 @@ export async function createTrabajadorUser(workerData) {
         const { nombre, rut, email, password, telefono, especialidad, rol } = workerData;
 
         // 1. Create temporary Supabase client to create user without logging out current admin
+        // CRITICAL: Must use a custom storage implementation (memory only) to prevent conflicting 
+        // with the main client's local storage session.
+        const memoryStorage = {
+            getItem: (key) => null,
+            setItem: (key, value) => { },
+            removeItem: (key) => { }
+        };
+
         const tempSupabase = createClient(
             import.meta.env.VITE_SUPABASE_URL,
             import.meta.env.VITE_SUPABASE_ANON_KEY,
@@ -214,7 +222,8 @@ export async function createTrabajadorUser(workerData) {
                 auth: {
                     persistSession: false,
                     autoRefreshToken: false,
-                    detectSessionInUrl: false
+                    detectSessionInUrl: false,
+                    storage: memoryStorage // Force memory storage
                 }
             }
         );
