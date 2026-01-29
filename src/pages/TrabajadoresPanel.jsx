@@ -47,11 +47,14 @@ export default function TrabajadoresPanel() {
         setCreating(true);
 
         try {
+            // CRITICAL: Save current supervisor session BEFORE creating new user
+            const { data: { session: supervisorSession } } = await supabase.auth.getSession();
+
             // Clean RUT for email
             const cleanId = cleanRut(formData.rut);
             const email = `${cleanId}@electrix.cl`;
 
-            // 1. Create Auth user (like in Registro.jsx)
+            // 1. Create Auth user (this will AUTO-LOGIN the new user, logging out supervisor)
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email,
                 password: formData.password,
@@ -87,6 +90,12 @@ export default function TrabajadoresPanel() {
 
             if (profileError) throw profileError;
 
+            // CRITICAL: Restore supervisor session immediately
+            if (supervisorSession) {
+                console.log('[TrabajadoresPanel] Restoring supervisor session...');
+                await supabase.auth.setSession(supervisorSession);
+            }
+
             alert(`Trabajador creado exitosamente.\n\nCredenciales de acceso:\nUsuario (RUT): ${formatRut(cleanId)}\nContraseña: ${formData.password}`);
             setShowModal(false);
             setFormData({
@@ -100,6 +109,12 @@ export default function TrabajadoresPanel() {
             });
             loadTrabajadores();
         } catch (error) {
+            // If error occurs, try to restore session anyway
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                console.error('[TrabajadoresPanel] Session lost, attempting recovery...');
+                window.location.reload(); // Force reload to restore session
+            }
             alert('Error al crear trabajador: ' + error.message);
         } finally {
             setCreating(false);
