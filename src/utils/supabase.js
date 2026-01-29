@@ -39,7 +39,8 @@ export async function getCurrentUser() {
                 return { timeout: true };
             }
             console.error('[supabase] getCurrentUser error:', error);
-            return null;
+            // Return error wrapper so we can distinguish from "success" (user object)
+            return { error };
         }
 
         if (user) {

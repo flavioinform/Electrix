@@ -223,6 +223,7 @@ export async function createTrabajadorUser(workerData) {
                     persistSession: false,
                     autoRefreshToken: false,
                     detectSessionInUrl: false,
+                    storageKey: 'temp-worker-create-session', // CRITICAL: Unique key to avoid collisions
                     storage: memoryStorage // Force memory storage
                 }
             }

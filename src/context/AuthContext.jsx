@@ -60,8 +60,10 @@ export function AuthProvider({ children }) {
         getCurrentUser().then(async (result) => {
             // result can be User object, null (error), or { timeout: true }
 
-            if (result?.timeout) {
-                console.warn('[AuthContext] Server check timed out. Attempting to use local session as fallback...');
+            // result can be User object, { error: ... }, or { timeout: true }
+
+            if (result?.timeout || result?.error) {
+                console.warn('[AuthContext] Server check failed/timed out. Attempting to use local session as fallback...');
 
                 // Fallback: Check local session (faster, no network verification)
                 const { data: { session } } = await supabase.auth.getSession();
@@ -72,16 +74,19 @@ export function AuthProvider({ children }) {
                     const profile = await fetchUserProfile(user);
                     setUserProfile(profile);
                 } else {
-                    console.warn('[AuthContext] No local session found either.');
+                    console.warn('[AuthContext] No local session found either. Clearing local state.');
+                    await supabaseLogout();
+                    setUser(null);
+                    setUserProfile(null);
                 }
             } else if (!result) {
-                // Explicit null means "No Session" or "Auth Error" (not timeout)
-                console.warn('[AuthContext] No valid server session found. Clearing local state.');
+                // Explicit null means "No Session" (success but empty)
+                console.warn('[AuthContext] No active session found. Clearing local state.');
                 await supabaseLogout();
                 setUser(null);
                 setUserProfile(null);
             } else {
-                // Valid user found
+                // Valid user found (result is the user object)
                 const user = result;
                 console.log('[AuthContext] Current user verified:', user.email);
                 setUser(user);
