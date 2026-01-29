@@ -47,18 +47,47 @@ export default function TrabajadoresPanel() {
         setCreating(true);
 
         try {
-            // Clean RUT for ID
+            // Clean RUT for email
             const cleanId = cleanRut(formData.rut);
+            const email = `${cleanId}@electrix.cl`;
 
-            // Format data
-            const newWorker = {
-                ...formData,
-                rut: cleanId // Ensure we send cleaned RUT/ID
-            };
+            // 1. Create Auth user (like in Registro.jsx)
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email,
+                password: formData.password,
+                options: {
+                    emailRedirectTo: undefined,
+                    data: {
+                        nombre: formData.nombre,
+                        rut: cleanId,
+                        rol: formData.rol
+                    }
+                }
+            });
 
-            await createTrabajadorUser(newWorker);
+            if (authError) {
+                if (authError.message.includes('already registered')) {
+                    throw new Error('Este RUT ya está registrado.');
+                }
+                throw authError;
+            }
 
-            alert('Trabajador creado exitosamente');
+            // 2. Create trabajador profile
+            const { error: profileError } = await supabase
+                .from('trabajadores')
+                .insert([{
+                    id: authData.user.id,
+                    nombre: formData.nombre,
+                    rut: cleanId,
+                    rol: formData.rol || 'trabajador',
+                    especialidad: formData.especialidad,
+                    telefono: formData.telefono || null,
+                    activo: true
+                }]);
+
+            if (profileError) throw profileError;
+
+            alert(`Trabajador creado exitosamente.\n\nCredenciales de acceso:\nUsuario (RUT): ${formatRut(cleanId)}\nContraseña: ${formData.password}`);
             setShowModal(false);
             setFormData({
                 nombre: '',

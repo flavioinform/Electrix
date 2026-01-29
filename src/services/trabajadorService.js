@@ -1,5 +1,5 @@
 import supabase from '../utils/supabase';
-import { createClient } from '@supabase/supabase-js';
+
 
 /**
  * Get all workers
@@ -198,91 +198,34 @@ export function subscribeToTrabajadores(callback) {
 }
 
 /**
- * Create a new Worker User (Auth + Profile)
- * @param {object} data - Worker data including email/password/role
- * @returns {Promise<object>} Created user object
+ * Create a new Worker with Auth credentials (via Edge Function)
+ * @param {object} data - Worker data including password
+ * @returns {Promise<object>} Created worker record
  */
 export async function createTrabajadorUser(workerData) {
     try {
         const { nombre, rut, email, password, telefono, especialidad, rol } = workerData;
 
-        // 0. Save current admin session to restore later if clobbered
-        const { data: { session: adminSession } } = await supabase.auth.getSession();
-
-        // 1. Create temporary Supabase client to create user without logging out current admin
-        // CRITICAL: Must use a custom storage implementation (memory only) to prevent conflicting 
-        // with the main client's local storage session.
-        const memoryStorage = {
-            getItem: (key) => null,
-            setItem: (key, value) => { },
-            removeItem: (key) => { }
-        };
-
-        const tempSupabase = createClient(
-            import.meta.env.VITE_SUPABASE_URL,
-            import.meta.env.VITE_SUPABASE_ANON_KEY,
-            {
-                auth: {
-                    persistSession: false,
-                    autoRefreshToken: false,
-                    detectSessionInUrl: false,
-                    storageKey: 'temp-worker-create-session', // CRITICAL: Unique key to avoid collisions
-                    storage: memoryStorage // Force memory storage
-                }
-            }
-        );
-
-        // 2. Determine email to register
-        // If email is provided, use it. If not, generate one from RUT (username logic)
-        const registerEmail = email && email.includes('@')
-            ? email
-            : `${rut}@electrix.cl`;
-
-        // 3. Register User in Auth
-        const { data: { user }, error: signUpError } = await tempSupabase.auth.signUp({
-            email: registerEmail,
-            password: password,
-            options: {
-                data: {
-                    rol: rol || 'trabajador',
-                    nombre: nombre,
-                    rut: rut
-                }
+        // Call Edge Function to create user with admin API (avoids session conflicts)
+        const { data, error } = await supabase.functions.invoke('create-worker', {
+            body: {
+                nombre,
+                rut,
+                email,
+                password,
+                telefono,
+                especialidad,
+                rol
             }
         });
 
-        if (signUpError) throw signUpError;
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
 
-        // CRITICAL: Restore Admin Session immediately
-        if (adminSession) {
-            console.log('Restoring admin session after worker creation...');
-            await supabase.auth.setSession(adminSession);
-        }
-
-        if (user) {
-            // 4. Create Public Profile in 'trabajadores'
-            const { error: profileError } = await supabase
-                .from('trabajadores')
-                .insert([{
-                    id: user.id,
-                    nombre: nombre,
-                    rut: rut,
-                    rol: rol || 'trabajador',
-                    especialidad: especialidad,
-                    telefono: telefono,
-                    activo: true
-                }]);
-
-            if (profileError) {
-                // Determine if we should delete the auth user or just warn
-                console.error('Error creating public profile for worker:', profileError);
-                throw new Error('Usuario creado pero falló el perfil: ' + profileError.message);
-            }
-        }
-
-        return user;
+        return data.user;
     } catch (error) {
-        console.error('Error creating worker user:', error);
+        console.error('Error creating worker:', error);
         throw error;
     }
 }
+
