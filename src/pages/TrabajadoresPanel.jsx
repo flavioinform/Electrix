@@ -1,29 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../utils/supabase';
-import { getTrabajadores, createTrabajadorUser } from '../services/trabajadorService';
-import { formatRut, cleanRut } from '../utils/rutValidator';
-import { Plus, Search, User, Shield, Briefcase, Mail, Phone, Lock, X } from 'lucide-react';
-import './FlujoTrabajo.css'; // Reusing existing styles for consistency
+import { getTrabajadores } from '../services/trabajadorService';
+import { formatRut } from '../utils/rutValidator';
+import { Search, Shield } from 'lucide-react';
+import './FlujoTrabajo.css';
 
 export default function TrabajadoresPanel() {
     const { isSupervisor } = useAuth();
     const [trabajadores, setTrabajadores] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [creating, setCreating] = useState(false);
-
-    // Form State
-    const [formData, setFormData] = useState({
-        nombre: '',
-        rut: '',
-        email: '',
-        password: '',
-        telefono: '',
-        especialidad: 'Electricista',
-        rol: 'trabajador'
-    });
 
     useEffect(() => {
         loadTrabajadores();
@@ -32,84 +18,12 @@ export default function TrabajadoresPanel() {
     const loadTrabajadores = async () => {
         try {
             const data = await getTrabajadores();
-            // Filter out 'cliente' role if you don't want to see them mixed in
             const staff = data.filter(t => t.rol !== 'cliente');
             setTrabajadores(staff);
         } catch (error) {
             console.error('Error loading trabajadores:', error);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleCreate = async (e) => {
-        e.preventDefault();
-        setCreating(true);
-
-        try {
-            // CRITICAL: Save current supervisor session BEFORE creating new user
-            const { data: { session: supervisorSession } } = await supabase.auth.getSession();
-
-            // Clean RUT for email
-            const cleanId = cleanRut(formData.rut);
-            const email = `${cleanId}@electrix.cl`;
-
-            // 1. Create Auth user (this will AUTO-LOGIN the new user, logging out supervisor)
-            const { data: authData, error: authError } = await supabase.auth.signUp({
-                email,
-                password: formData.password,
-                options: {
-                    emailRedirectTo: undefined,
-                    data: {
-                        nombre: formData.nombre,
-                        rut: cleanId,
-                        rol: formData.rol
-                    }
-                }
-            });
-
-            if (authError) {
-                if (authError.message.includes('already registered')) {
-                    throw new Error('Este RUT ya está registrado.');
-                }
-                throw authError;
-            }
-
-            // 2. Create trabajador profile
-            const { error: profileError } = await supabase
-                .from('trabajadores')
-                .insert([{
-                    id: authData.user.id,
-                    nombre: formData.nombre,
-                    rut: cleanId,
-                    rol: formData.rol || 'trabajador',
-                    especialidad: formData.especialidad,
-                    telefono: formData.telefono || null,
-                    activo: true
-                }]);
-
-            if (profileError) throw profileError;
-
-            // CRITICAL: Restore supervisor session immediately
-            if (supervisorSession) {
-                console.log('[TrabajadoresPanel] Restoring supervisor session...');
-                await supabase.auth.setSession(supervisorSession);
-            }
-
-            alert(`Trabajador creado exitosamente.\n\nCredenciales de acceso:\nUsuario (RUT): ${formatRut(cleanId)}\nContraseña: ${formData.password}`);
-
-            // Reload page to restore supervisor session cleanly
-            window.location.reload();
-        } catch (error) {
-            // If error occurs, try to restore session anyway
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
-                console.error('[TrabajadoresPanel] Session lost, attempting recovery...');
-                window.location.reload(); // Force reload to restore session
-            }
-            alert('Error al crear trabajador: ' + error.message);
-        } finally {
-            setCreating(false);
         }
     };
 
@@ -127,12 +41,27 @@ export default function TrabajadoresPanel() {
                         <Shield className="text-primary" size={24} />
                         <h2>Gestión de Equipo</h2>
                     </div>
-                    {isSupervisor && (
-                        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-                            <Plus size={18} />
-                            Agregar Trabajador
+                </div>
+
+                {/* Instrucciones de Registro */}
+                <div className="glass-card" style={{ padding: '20px', marginBottom: '20px', background: 'rgba(59, 130, 246, 0.1)', borderLeft: '4px solid var(--color-primary)' }}>
+                    <h3 style={{ marginTop: 0, color: 'var(--color-primary)' }}>📋 Registro de Trabajadores</h3>
+                    <p style={{ margin: '10px 0' }}>Los trabajadores deben registrarse usando el siguiente enlace:</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
+                        <code style={{ flex: 1, color: 'var(--color-success)' }}>{window.location.origin}/registro</code>
+                        <button
+                            className="btn btn-sm btn-primary"
+                            onClick={() => {
+                                navigator.clipboard.writeText(`${window.location.origin}/registro`);
+                                alert('¡Link copiado al portapapeles!');
+                            }}
+                        >
+                            Copiar Link
                         </button>
-                    )}
+                    </div>
+                    <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginTop: '10px' }}>
+                        Una vez registrados, aparecerán automáticamente en esta lista.
+                    </p>
                 </div>
 
                 {/* Search Bar */}
@@ -202,118 +131,6 @@ export default function TrabajadoresPanel() {
                     )}
                 </div>
             </section>
-
-            {/* Modal Crear Trabajador */}
-            {showModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content glass-card">
-                        <div className="modal-header">
-                            <h3>Registrar Nuevo Trabajador</h3>
-                            <button className="btn-icon" onClick={() => setShowModal(false)}>
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleCreate} className="modal-form">
-                            <div className="input-group">
-                                <label className="input-label"><User size={16} /> Nombre Completo</label>
-                                <input
-                                    required
-                                    className="input-field"
-                                    value={formData.nombre}
-                                    onChange={e => setFormData({ ...formData, nombre: e.target.value })}
-                                    placeholder="Juan Pérez"
-                                />
-                            </div>
-
-                            <div className="input-group">
-                                <label className="input-label"><Shield size={16} /> RUT / Usuario</label>
-                                <input
-                                    required
-                                    className="input-field"
-                                    value={formData.rut}
-                                    onChange={e => setFormData({ ...formData, rut: formatRut(e.target.value) })}
-                                    placeholder="12.345.678-9"
-                                />
-                            </div>
-
-                            <div className="input-group">
-                                <label className="input-label"><Mail size={16} /> Email (Opcional)</label>
-                                <input
-                                    type="email"
-                                    className="input-field"
-                                    value={formData.email}
-                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                    placeholder="correo@ejemplo.com"
-                                />
-                                <small className="text-muted">Si se deja vacío, se usará [RUT]@electrix.cl</small>
-                            </div>
-
-                            <div className="input-group">
-                                <label className="input-label"><Lock size={16} /> Contraseña</label>
-                                <input
-                                    required
-                                    type="password"
-                                    className="input-field"
-                                    value={formData.password}
-                                    onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                    placeholder="Mínimo 6 caracteres"
-                                    minLength={6}
-                                />
-                            </div>
-
-                            <div className="input-group">
-                                <label className="input-label"><Phone size={16} /> Teléfono</label>
-                                <input
-                                    className="input-field"
-                                    value={formData.telefono}
-                                    onChange={e => setFormData({ ...formData, telefono: e.target.value })}
-                                    placeholder="+56 9 1234 5678"
-                                />
-                            </div>
-
-                            <div className="form-row">
-                                <div className="input-group">
-                                    <label className="input-label"><Briefcase size={16} /> Especialidad</label>
-                                    <select
-                                        className="input-field"
-                                        value={formData.especialidad}
-                                        onChange={e => setFormData({ ...formData, especialidad: e.target.value })}
-                                    >
-                                        <option value="Electricista">Electricista</option>
-                                        <option value="Ayudante">Ayudante</option>
-                                        <option value="Técnico">Técnico</option>
-                                        <option value="Supervisor">Supervisor</option>
-                                        <option value="Administrativo">Administrativo</option>
-                                    </select>
-                                </div>
-
-                                <div className="input-group">
-                                    <label className="input-label"><Shield size={16} /> Rol de Sistema</label>
-                                    <select
-                                        className="input-field"
-                                        value={formData.rol}
-                                        onChange={e => setFormData({ ...formData, rol: e.target.value })}
-                                    >
-                                        <option value="trabajador">Trabajador</option>
-                                        <option value="supervisor">Supervisor</option>
-                                        <option value="admin">Administrador</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="modal-actions">
-                                <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>
-                                    Cancelar
-                                </button>
-                                <button type="submit" className="btn btn-primary" disabled={creating}>
-                                    {creating ? 'Creando...' : 'Crear Trabajador'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
