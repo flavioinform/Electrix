@@ -19,12 +19,12 @@ export async function getCurrentUser() {
     try {
         console.log('[supabase] Getting current user (checking session)...');
 
-        // Timeout promise after 5 seconds to prevent hanging
+        // Timeout promise after 15 seconds to prevent hanging (increased from 5s)
         const timeoutPromise = new Promise((resolve) => {
             setTimeout(() => {
-                console.warn('[supabase] getCurrentUser timed out after 5s - assuming no session');
+                console.warn('[supabase] getCurrentUser timed out after 15s - assuming no session');
                 resolve({ data: { user: null }, error: { message: 'Timeout' } });
-            }, 5000);
+            }, 15000);
         });
 
         // Race between actual fetch and timeout

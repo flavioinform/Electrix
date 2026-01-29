@@ -61,10 +61,19 @@ export function AuthProvider({ children }) {
             // result can be User object, null (error), or { timeout: true }
 
             if (result?.timeout) {
-                console.warn('[AuthContext] Server check timed out. Keeping existing state (if any) or assuming offline.');
-                // If we have a user from onAuthStateChange (which fires often before this completes), keep it.
-                // If we don't, we might be truly logged out or just offline. 
-                // We won't force logout here to be safe.
+                console.warn('[AuthContext] Server check timed out. Attempting to use local session as fallback...');
+
+                // Fallback: Check local session (faster, no network verification)
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.user) {
+                    console.log('[AuthContext] Local session found during timeout fallback:', session.user.email);
+                    const user = session.user;
+                    setUser(user);
+                    const profile = await fetchUserProfile(user);
+                    setUserProfile(profile);
+                } else {
+                    console.warn('[AuthContext] No local session found either.');
+                }
             } else if (!result) {
                 // Explicit null means "No Session" or "Auth Error" (not timeout)
                 console.warn('[AuthContext] No valid server session found. Clearing local state.');
