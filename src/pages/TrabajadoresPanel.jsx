@@ -97,17 +97,9 @@ export default function TrabajadoresPanel() {
             }
 
             alert(`Trabajador creado exitosamente.\n\nCredenciales de acceso:\nUsuario (RUT): ${formatRut(cleanId)}\nContraseña: ${formData.password}`);
-            setShowModal(false);
-            setFormData({
-                nombre: '',
-                rut: '',
-                email: '',
-                password: '',
-                telefono: '',
-                especialidad: 'Electricista',
-                rol: 'trabajador'
-            });
-            loadTrabajadores();
+
+            // Reload page to restore supervisor session cleanly
+            window.location.reload();
         } catch (error) {
             // If error occurs, try to restore session anyway
             const { data: { session } } = await supabase.auth.getSession();
