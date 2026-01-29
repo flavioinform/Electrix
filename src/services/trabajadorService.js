@@ -206,6 +206,9 @@ export async function createTrabajadorUser(workerData) {
     try {
         const { nombre, rut, email, password, telefono, especialidad, rol } = workerData;
 
+        // 0. Save current admin session to restore later if clobbered
+        const { data: { session: adminSession } } = await supabase.auth.getSession();
+
         // 1. Create temporary Supabase client to create user without logging out current admin
         // CRITICAL: Must use a custom storage implementation (memory only) to prevent conflicting 
         // with the main client's local storage session.
@@ -249,6 +252,12 @@ export async function createTrabajadorUser(workerData) {
         });
 
         if (signUpError) throw signUpError;
+
+        // CRITICAL: Restore Admin Session immediately
+        if (adminSession) {
+            console.log('Restoring admin session after worker creation...');
+            await supabase.auth.setSession(adminSession);
+        }
 
         if (user) {
             // 4. Create Public Profile in 'trabajadores'
